@@ -31,16 +31,13 @@ public class Startup: FunctionsStartup
         // repositories
         builder.Services.AddScoped<StorageAccountTableConnection>();
         builder.Services.AddScoped<TimeLogRelation>();
-        builder.Services.AddScoped<Repositories.JobNameRelation>();
-        builder.Services.AddScoped<ProjectNameRelation>();
+        builder.Services.AddScoped<JobNameRelation>();
         builder.Services.AddScoped<AccessTokenRepo>();
 
         // services
         builder.Services.AddScoped<ZohoTimeLog>();
-        builder.Services.AddScoped<ZohoProjectName>();
         builder.Services.AddScoped<ZohoJobName>();
         builder.Services.AddScoped<ZohoConnection>();
         builder.Services.AddScoped<JobName>();
-        builder.Services.AddScoped<ProjectName>();
     }
 }
