@@ -1,0 +1,46 @@
+﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.WebJobs.Host.Bindings;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using ZohoIntegration.TimeLogs.Repositories;
+using ZohoIntegration.TimeLogs.Services;
+
+[assembly: FunctionsStartup(typeof(ZohoIntegration.TimeLogs.Startup))]
+
+namespace ZohoIntegration.TimeLogs;
+public class Startup: FunctionsStartup
+{
+    public override void Configure(IFunctionsHostBuilder builder)
+    {
+        // builder.Services.AddHttpClient();
+
+        var executionContextOptions = builder.Services.BuildServiceProvider()
+            .GetService<IOptions<ExecutionContextOptions>>().Value;
+
+        var functionAppDirectory = executionContextOptions.AppDirectory;
+
+        var config = new ConfigurationBuilder()
+            .SetBasePath(functionAppDirectory)
+            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        builder.Services.AddScoped(svc => config);
+
+        // repositories
+        builder.Services.AddScoped<StorageAccountTableConnection>();
+        builder.Services.AddScoped<TimeLogRelation>();
+        builder.Services.AddScoped<Repositories.JobNameRelation>();
+        builder.Services.AddScoped<ProjectNameRelation>();
+        builder.Services.AddScoped<AccessTokenRepo>();
+
+        // services
+        builder.Services.AddScoped<ZohoTimeLog>();
+        builder.Services.AddScoped<ZohoProjectName>();
+        builder.Services.AddScoped<ZohoJobName>();
+        builder.Services.AddScoped<ZohoConnection>();
+        builder.Services.AddScoped<JobName>();
+        builder.Services.AddScoped<ProjectName>();
+    }
+}
