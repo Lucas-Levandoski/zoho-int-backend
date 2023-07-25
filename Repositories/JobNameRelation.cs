@@ -88,4 +88,28 @@ public class JobNameRelation
 
         return result;
     }
+
+    public List<JobNameRelationEntity> ListAllJobsByBRId(string jobId) 
+    {
+        var result = tableClient.Query<JobNameRelationEntity>(filter: table => table.BRJobId == jobId).ToList();
+
+        return result;
+    }
+
+    public List<JobNameRelationEntity> ListAllJobsByUKId(string jobId) 
+    {
+        var result = tableClient.Query<JobNameRelationEntity>(filter: table => table.UKJobId == jobId).ToList();
+
+        return result;
+    }
+
+    public void UpdateList(List<JobNameRelationEntity> jobs)
+    {
+        foreach(var job in jobs)
+        {
+            tableClient.DeleteEntity(job.PartitionKey, job.RowKey);
+
+            tableClient.AddEntity(job);
+        }
+    }
 }

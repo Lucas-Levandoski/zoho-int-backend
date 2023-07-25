@@ -119,4 +119,40 @@ public class JobNameRelationsFunction
 
         return new OkObjectResult(result);
     }
-}
+
+    [FunctionName("JobNameRelationUpdateAllBRJobNames")]
+    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "Job ID")]
+    public async Task<IActionResult> UpdateBRJobNames(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "JobName/JobDetails/update/Br/{id}")] HttpRequest req,
+        string id,
+        ILogger log)
+    {
+        try {
+            int count = await _zohoJobNameService.UpdateBRJobDetails(id);
+
+            return new OkObjectResult(
+                $"Updated {count} BR job relations"
+            );
+        } catch(InvalidOperationException ex) {
+            return new BadRequestObjectResult(ex.Message);
+        }
+    }
+
+    [FunctionName("JobNameRelationUpdateAllUKJobNames")]
+    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "Job ID")]
+    public async Task<IActionResult> UpdateUKJobNames(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "JobName/JobDetails/update/Uk/{id}")] HttpRequest req,
+        string id,
+        ILogger log)
+    {
+        try {
+            int count = await _zohoJobNameService.UpdateUKJobDetails(id);
+
+            return new OkObjectResult(
+                $"Updated {count} UK job relations"
+            );
+        } catch(InvalidOperationException ex) {
+            return new BadRequestObjectResult(ex.Message);
+        }
+    }
+}   
