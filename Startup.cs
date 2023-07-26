@@ -37,6 +37,7 @@ public class Startup: FunctionsStartup
         // services
         builder.Services.AddScoped<ZohoTimeLog>();
         builder.Services.AddScoped<ZohoJobName>();
+        builder.Services.AddScoped<ZohoProjects>();
         builder.Services.AddScoped<ZohoConnection>();
         builder.Services.AddScoped<JobName>();
     }

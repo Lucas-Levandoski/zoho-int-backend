@@ -107,7 +107,7 @@ public class ZohoConnection
             default:
                 throw new SystemException("missing target zoho account");
         }
-        
+
         var apiReturn = await httpClient.GetAsync(uri);
 
         // if the request fails it will try to refresh the access token and try only once more

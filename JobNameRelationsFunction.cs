@@ -5,9 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Extensions.Logging;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ZohoIntegration.TimeLogs.Models;
 using ZohoIntegration.TimeLogs.Services;
@@ -47,7 +45,6 @@ public class JobNameRelationsFunction
 
 
     [FunctionName("JobNameRelationUpdate")]
-    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "ID of the job name relation")]
     public async Task<IActionResult> Update(
         [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "JobName/{id}")] HttpRequest req,
         string id,
@@ -73,13 +70,6 @@ public class JobNameRelationsFunction
 
 
     [FunctionName("JobNameRelationDelete")]
-    [OpenApiParameter(
-        name: "id", 
-        In = ParameterLocation.Path, 
-        Required = false, 
-        Type = typeof(string), 
-        Description = "ID of the job name relation"
-    )]
     public IActionResult Delete(
         [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = "JobName/{id}")] HttpRequest req, 
         string id,
@@ -90,26 +80,6 @@ public class JobNameRelationsFunction
         return new OkObjectResult($"All fine for the delete process, with BR Name {currentBRName} and UK Name {currentUKName}");
     }
 
-    [FunctionName("JobNamesListBR")]
-    public async Task<IActionResult> ListBR(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "JobName/list/br")] HttpRequest req,
-        ILogger log)
-    {
-        var result = await _zohoJobNameService.ListBRJobNames();
-
-        return new OkObjectResult(result);
-    }
-
-    [FunctionName("JobNamesListUK")]
-    public async Task<IActionResult> ListUK(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "JobName/list/uk")] HttpRequest req,
-        ILogger log) 
-    {
-        var result = await _zohoJobNameService.ListUKJobNames();
-
-        return new OkObjectResult(result);
-    }
-
     [FunctionName("JobNamesListAllRelations")]
     public IActionResult ListAllRelations(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "JobName/relations/list")] HttpRequest req,
@@ -118,41 +88,5 @@ public class JobNameRelationsFunction
         var result = _jobNameService.ListAll();
 
         return new OkObjectResult(result);
-    }
-
-    [FunctionName("JobNameRelationUpdateAllBRJobNames")]
-    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "Job ID")]
-    public async Task<IActionResult> UpdateBRJobNames(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "JobName/JobDetails/update/Br/{id}")] HttpRequest req,
-        string id,
-        ILogger log)
-    {
-        try {
-            int count = await _zohoJobNameService.UpdateBRJobDetails(id);
-
-            return new OkObjectResult(
-                $"Updated {count} BR job relations"
-            );
-        } catch(InvalidOperationException ex) {
-            return new BadRequestObjectResult(ex.Message);
-        }
-    }
-
-    [FunctionName("JobNameRelationUpdateAllUKJobNames")]
-    [OpenApiParameter(name: "id", In = ParameterLocation.Path, Required = false, Type = typeof(string), Description = "Job ID")]
-    public async Task<IActionResult> UpdateUKJobNames(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "JobName/JobDetails/update/Uk/{id}")] HttpRequest req,
-        string id,
-        ILogger log)
-    {
-        try {
-            int count = await _zohoJobNameService.UpdateUKJobDetails(id);
-
-            return new OkObjectResult(
-                $"Updated {count} UK job relations"
-            );
-        } catch(InvalidOperationException ex) {
-            return new BadRequestObjectResult(ex.Message);
-        }
     }
 }   

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Hosting;
 using ZohoIntegration.TimeLogs.Enums;
 using ZohoIntegration.TimeLogs.Models;
 using ZohoIntegration.TimeLogs.Repositories;
@@ -82,7 +81,7 @@ public class ZohoJobName
                 PartitionKey = job.PartitionKey
             });
         }
-            _jobNameRepo.UpdateList(newJobs);
+            _jobNameRepo.UpdateOrCreateList(newJobs);
         
 
         return jobs.Count;
@@ -115,7 +114,7 @@ public class ZohoJobName
             });
         }
 
-        _jobNameRepo.UpdateList(newJobs);
+        _jobNameRepo.UpdateOrCreateList(newJobs);
         
         return jobs.Count;
     }

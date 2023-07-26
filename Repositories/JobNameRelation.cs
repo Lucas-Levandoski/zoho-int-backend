@@ -42,6 +42,31 @@ public class JobNameRelation
         return entity;
     }
 
+    
+    public JobNameRelationEntity SaveRelation(
+        JobNameRelationEntity relationInput,
+        string? rowKey = null)
+    {
+        var entity = new JobNameRelationEntity()
+        {
+            BRJobName = relationInput.BRJobName,
+            BRJobId = relationInput.BRJobId,
+            BRJobProjectId = relationInput.BRJobProjectId,
+            BRJobProjectName = relationInput.BRJobProjectName,
+            UKJobName = relationInput.UKJobName,
+            UKJobId = relationInput.UKJobId,
+            UKJobProjectId = relationInput.UKJobProjectId,
+            UKJobProjectName = relationInput.UKJobProjectName,
+            PartitionKey = "2",
+            RowKey = rowKey ?? Guid.NewGuid().ToString(),
+            ETag = new ETag(),
+        };
+
+        tableClient.AddEntity(entity);
+
+        return entity;
+    }
+
     public void DeleteRelation(string partitionKey, string rowKey)
     {
         tableClient.DeleteEntity(partitionKey, rowKey);
@@ -103,13 +128,20 @@ public class JobNameRelation
         return result;
     }
 
-    public void UpdateList(List<JobNameRelationEntity> jobs)
+    public void UpdateOrCreateList(List<JobNameRelationEntity> jobs)
     {
         foreach(var job in jobs)
         {
-            tableClient.DeleteEntity(job.PartitionKey, job.RowKey);
+            if(job.PartitionKey != null & job.RowKey != null)
+            {
+                tableClient.DeleteEntity(job.PartitionKey, job.RowKey);
 
-            tableClient.AddEntity(job);
+                tableClient.AddEntity(job);
+
+                break;
+            }
+
+            SaveRelation(job);
         }
     }
 }
