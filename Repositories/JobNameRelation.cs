@@ -139,7 +139,7 @@ public class JobNameRelation
 
                 tableClient.AddEntity(job);
 
-                break;
+                continue;
             }
 
             SaveRelation(job);
