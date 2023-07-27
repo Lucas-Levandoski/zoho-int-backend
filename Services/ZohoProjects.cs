@@ -26,6 +26,18 @@ public class ZohoProjects
 
     public async Task createRelationsByProjectSyncFlag()
     {
+        var projectIds = await GetProjectIdsToSync();
+
+        var brJobs = await FindBRJobsByProjectIds(projectIds);
+
+        var matchingJobs = await FindMatchingUKJobs(brJobs);
+
+        _jobNameRepo.UpdateOrCreateList(matchingJobs);
+
+        return; 
+    }
+
+    private async Task<List<string>> GetProjectIdsToSync() {
         var searchParams = new
         {
             searchField = "SyncToUK",
@@ -47,9 +59,14 @@ public class ZohoProjects
             projectIds.AddRange(projectDict.Keys);
         }
 
+        return projectIds;
+    }
+
+    private async Task<List<JobNamesResult>> FindBRJobsByProjectIds(List<string> ids)
+    {
         List<JobNamesResult> jobs = new();
 
-        await Parallel.ForEachAsync(projectIds, body: async (projectId, ct) => {
+        await Parallel.ForEachAsync(ids, body: async (projectId, ct) => {
             var resultJobs = (await _zohoConnection.GetAsync<JobNamesView>($"timetracker/getjobs?assingedTo=all&projectId={projectId}", target: Enums.TargetZohoAccount.BR))?.response?.result;
 
             if(resultJobs == null)
@@ -58,44 +75,39 @@ public class ZohoProjects
             jobs.AddRange(resultJobs);
         });
 
+        return jobs;
+    }
+
+    private async Task<List<JobNameRelationEntity>> FindMatchingUKJobs(List<JobNamesResult> brJobs)
+    {
         var ukJobs = (await _zohoConnection.GetAsync<JobNamesView>($"timetracker/getjobs?assingedTo=all", target: Enums.TargetZohoAccount.UK))?.response?.result;
 
         if(ukJobs == null)
             throw new DataException("Not able to find any job from UK Zoho");
 
-        var matchingJobsPreview = ukJobs.Join(
-            jobs, 
+        var matchingJobs = ukJobs.Join(
+            brJobs, 
             ukJob => ukJob.jobName, 
             brJob => brJob.jobName, 
-            (ukJob, brJob) =>  new JobNameRelationEntity() { 
-                BRJobName = brJob.jobName,
-                BRJobId = brJob.jobId,
-                BRJobProjectName = brJob.projectName,
-                BRJobProjectId = brJob.projectId,
-                UKJobId = ukJob.jobId ,
-                UKJobName = ukJob.jobName,
-                UKJobProjectName = ukJob.projectName,
-                UKJobProjectId = ukJob.projectId
+            (ukJob, brJob) =>  {
+                var (_, relation) = _jobNameRepo.CheckExistingRelationByBRId(brJob.jobId);
+                
+                return new JobNameRelationEntity() { 
+                    BRJobName = brJob.jobName,
+                    BRJobId = brJob.jobId,
+                    BRJobProjectName = brJob.projectName,
+                    BRJobProjectId = brJob.projectId,
+                    UKJobId = ukJob.jobId ,
+                    UKJobName = ukJob.jobName,
+                    UKJobProjectName = ukJob.projectName,
+                    UKJobProjectId = ukJob.projectId,
+                    ETag = relation?.ETag ?? default,
+                    RowKey = relation?.RowKey ?? default,
+                    PartitionKey = relation?.PartitionKey ?? default,
+                };
             })
         .ToList();
 
-        List<JobNameRelationEntity> matchingJobs = new();
-
-        await Parallel.ForEachAsync(matchingJobsPreview, body: async (job, ct) => {
-            var (_, relation) = _jobNameRepo.CheckExistingRelationByBRId(job.BRJobId);
-
-            if( relation != null )
-            {
-                job.ETag = relation.ETag;
-                job.RowKey = relation.RowKey;
-                job.PartitionKey = relation.PartitionKey;
-            }
-
-            matchingJobs.Add(job);
-        });
-
-        _jobNameRepo.UpdateOrCreateList(matchingJobs);
-
-        return; 
-    }
+        return matchingJobs;
+    } 
 }

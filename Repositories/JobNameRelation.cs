@@ -132,7 +132,8 @@ public class JobNameRelation
     {
         foreach(var job in jobs)
         {
-            if(job.PartitionKey != null & job.RowKey != null)
+            if (job.PartitionKey != null && job.PartitionKey != default && 
+                job.RowKey != null && job.RowKey != default)
             {
                 tableClient.DeleteEntity(job.PartitionKey, job.RowKey);
 
