@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -92,7 +93,7 @@ public class ZohoConnection
     }
 
 
-    public async Task<T> GetAsync<T>(string uri, TargetZohoAccount target = TargetZohoAccount.UK)
+    public async Task<T> GetAsync<T>(string uri, TargetZohoAccount target = TargetZohoAccount.UK, Dictionary<string, string>? queryParams = null)
     {
         HttpClient httpClient;
 
@@ -107,6 +108,9 @@ public class ZohoConnection
             default:
                 throw new SystemException("missing target zoho account");
         }
+
+        if(queryParams != null)
+            uri += $"?{string.Join("&", queryParams.Select(item => $"{item.Key}={item.Value}"))}";
 
         var apiReturn = await httpClient.GetAsync(uri);
 

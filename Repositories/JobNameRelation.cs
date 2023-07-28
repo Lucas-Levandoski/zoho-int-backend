@@ -107,6 +107,13 @@ public class JobNameRelation
         return (result?.RowKey != null, result);
     }
 
+    public (bool isExists, JobNameRelationEntity? relation) CheckExistingRelationByUKId(string UKJobId)
+    {
+        var result = tableClient.Query<JobNameRelationEntity>(filter: table => table.UKJobId == UKJobId).FirstOrDefault();
+
+        return (result?.RowKey != null, result);
+    }
+
     public List<JobNameRelationEntity> ListAll()
     {
         var result = tableClient.Query<JobNameRelationEntity>().ToList();

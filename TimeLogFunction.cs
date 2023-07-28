@@ -13,9 +13,9 @@ namespace ZohoIntegration.TimeLogs;
 
 public class TimeLogFunction
 {
-    private readonly ZohoTimeLog _timeLogService;
+    private readonly ZohoTimeLogs _timeLogService;
 
-    public TimeLogFunction(ZohoTimeLog readTimeService)
+    public TimeLogFunction(ZohoTimeLogs readTimeService)
     {
         _timeLogService = readTimeService;
     }

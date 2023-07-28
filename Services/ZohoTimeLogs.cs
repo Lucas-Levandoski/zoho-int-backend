@@ -10,13 +10,13 @@ using ZohoIntegration.TimeLogs.Repositories;
 
 namespace ZohoIntegration.TimeLogs.Services
 {
-    public class ZohoTimeLog
+    public class ZohoTimeLogs
     {
         private readonly TimeLogRelation _timeLogRepo;  
         private readonly JobNameRelation _jobNameRepo;  
         private readonly ZohoConnection _zohoConnection;
 
-        public ZohoTimeLog(
+        public ZohoTimeLogs(
             TimeLogRelation timeLogRelation, 
             ZohoConnection zohoConnection,
             JobNameRelation jobNameRelation) 
@@ -28,7 +28,7 @@ namespace ZohoIntegration.TimeLogs.Services
 
         public async Task<TimeLogDetailsView> GetBRTimelogByIDAsync(string id)
         {
-            var result = await _zohoConnection.GetAsync<TimeLogDetailsView>($"timetracker/gettimelogdetails?timelogId={id}", TargetZohoAccount.BR);
+            var result = await _zohoConnection.GetAsync<TimeLogDetailsView>($"timetracker/gettimelogdetails?timelogId={id}", target: TargetZohoAccount.BR);
 
             return result;
         }

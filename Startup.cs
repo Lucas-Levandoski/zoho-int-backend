@@ -35,7 +35,8 @@ public class Startup: FunctionsStartup
         builder.Services.AddScoped<AccessTokenRepo>();
 
         // services
-        builder.Services.AddScoped<ZohoTimeLog>();
+        builder.Services.AddScoped<ZohoTimeLogs>();
+        builder.Services.AddScoped<ZohoTimesheets>();
         builder.Services.AddScoped<ZohoJobName>();
         builder.Services.AddScoped<ZohoProjects>();
         builder.Services.AddScoped<ZohoConnection>();
