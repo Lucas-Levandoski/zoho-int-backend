@@ -15,34 +15,36 @@ public class ZohoTimesheets
 
     private readonly ZohoConnection _zohoConnection;
     private readonly JobNameRelation _jobNameRepo;
+    private readonly UsersRepo _usersRepo;
     private readonly string dateFormat = "dd-MMM-yyyy";
     private readonly DateTime today = DateTime.Today;
     private readonly CultureInfo culture;
 
-    public ZohoTimesheets(ZohoConnection zohoConnection, JobNameRelation jobNameRelation)
+    public ZohoTimesheets(ZohoConnection zohoConnection, JobNameRelation jobNameRelation, UsersRepo usersRepo)
     {
         _zohoConnection = zohoConnection;
         _jobNameRepo = jobNameRelation;
+        _usersRepo = usersRepo;
         culture = CultureInfo.GetCultureInfo("en-US");
     }
 
     public async Task CreateTimesheets()
     {
-        string user = "lucas-levandoski@hotmail.com";
+        await Parallel.ForEachAsync(_usersRepo.ListAll(), body: async (userEntity, ct) => {
+            var jobIds = await FindUKJobIdsByUser(userEntity.UserMail);
 
-        var jobIds = await FindUKJobIdsByUser(user);
+            await Parallel.ForEachAsync(jobIds, body: async (jobId, ct) => {
+                // filters to only check for existing relations
+                var (isExists, relation) = _jobNameRepo.CheckExistingRelationByUKId(jobId);
 
-        await Parallel.ForEachAsync(jobIds, body: async (jobId, ct) => {
-            // filters to only check for existing relations
-            var (isExists, relation) = _jobNameRepo.CheckExistingRelationByUKId(jobId);
+                if(!isExists) return;
+                
+                var (newest, oldest) = await CheckNotSubmittedUKTimelogCurrentMonth(userEntity.UserMail, jobId);
+                
+                if(newest == null || oldest == null) return;
 
-            if(!isExists) return;
-            
-            var (newest, oldest) = await CheckNotSubmittedUKTimelogCurrentMonth(user, jobId);
-            
-            if(newest == null || oldest == null) return;
-
-            await CreateTimesheet(user, jobId, relation!.UKJobName,newest.Value, oldest.Value);
+                await CreateTimesheet(userEntity.UserMail, jobId, relation!.UKJobName, newest.Value, oldest.Value);
+            });
         });
 
         return;

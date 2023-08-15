@@ -33,6 +33,7 @@ public class Startup: FunctionsStartup
         builder.Services.AddScoped<TimeLogRelation>();
         builder.Services.AddScoped<JobNameRelation>();
         builder.Services.AddScoped<AccessTokenRepo>();
+        builder.Services.AddScoped<UsersRepo>();
 
         // services
         builder.Services.AddScoped<ZohoTimeLogs>();
@@ -41,5 +42,6 @@ public class Startup: FunctionsStartup
         builder.Services.AddScoped<ZohoProjects>();
         builder.Services.AddScoped<ZohoConnection>();
         builder.Services.AddScoped<JobName>();
+        builder.Services.AddScoped<Users>();
     }
 }

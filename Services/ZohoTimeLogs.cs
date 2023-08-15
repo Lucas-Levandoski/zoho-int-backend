@@ -15,6 +15,8 @@ namespace ZohoIntegration.TimeLogs.Services
         private readonly TimeLogRelation _timeLogRepo;  
         private readonly JobNameRelation _jobNameRepo;  
         private readonly ZohoConnection _zohoConnection;
+        private readonly string brAutoText = "From Brazilian Zoho: ";
+        private readonly string dateFormat = "dd-MMM-yyyy";
 
         public ZohoTimeLogs(
             TimeLogRelation timeLogRelation, 
@@ -53,10 +55,10 @@ namespace ZohoIntegration.TimeLogs.Services
                 {"user", sourceLog.employeeMailId},
                 {"jobId", targetJob.UKJobId},
                 {"workDate", sourceLog.workDate},
-                {"dateFormat", "dd-MMM-yyyy"},
+                {"dateFormat", dateFormat},
                 {"hours", sourceLog.hours},
                 {"billingStatus", sourceLog.billingStatus},
-                {"workItem", sourceLog.taskName},
+                {"workItem", $"{brAutoText}{sourceLog.taskName}"},
                 {"description", sourceLog.description}
             };
 
@@ -90,10 +92,10 @@ namespace ZohoIntegration.TimeLogs.Services
                 {"user", sourceLog.employeeMailId},
                 {"jobId", targetJob.UKJobId},
                 {"workDate", sourceLog.workDate},
-                {"dateFormat", "dd-MMM-yyyy"},
+                {"dateFormat", dateFormat},
                 {"hours", sourceLog.hours},
                 {"billingStatus", sourceLog.billingStatus},
-                {"workItem", sourceLog.taskName},
+                {"workItem", $"{brAutoText}{sourceLog.taskName}"},
                 {"description", sourceLog.description}
             };
 
