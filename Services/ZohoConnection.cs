@@ -17,7 +17,8 @@ public class ZohoConnection
     private readonly AccessTokenRepo _accessTokenRepo;
     private HttpClient zUKPeopleHttpClient;
     private HttpClient zBRPeopleHttpClient;
-    private HttpClient zAccountsHttpClient;
+    private HttpClient zBRAccountsHttpClient;
+    private HttpClient zUKAccountsHttpClient;
 
     public ZohoConnection(AccessTokenRepo accessTokenRepo)
     {
@@ -28,17 +29,22 @@ public class ZohoConnection
 
         zUKPeopleHttpClient = new () 
         {
-            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_PEOPLE_URI") ?? throw new SystemException("Missing ZOHO_PEOPLE_URI env var"))
+            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_UK_PEOPLE_URI") ?? throw new SystemException("Missing ZOHO_UK_PEOPLE_URI env var"))
+        };
+
+        zUKAccountsHttpClient = new () 
+        {
+            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_UK_ACCOUNTS_URI") ?? throw new SystemException("Missing ZOHO_UK_ACCOUNTS_URI env var"))
         };
 
         zBRPeopleHttpClient = new () 
         {
-            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_PEOPLE_URI") ?? throw new SystemException("Missing ZOHO_PEOPLE_URI env var"))
+            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_BR_PEOPLE_URI") ?? throw new SystemException("Missing ZOHO_BR_PEOPLE_URI env var"))
         };
 
-        zAccountsHttpClient = new () 
+        zBRAccountsHttpClient = new () 
         {
-            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_ACCOUNTS_URI") ?? throw new SystemException("Missing ZOHO_ACCOUNTS_URI env var"))
+            BaseAddress = new Uri(Environment.GetEnvironmentVariable("ZOHO_BR_ACCOUNTS_URI") ?? throw new SystemException("Missing ZOHO_BR_ACCOUNTS_URI env var"))
         };
 
         zUKPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", _accessTokenRepo.GetCurrentToken(TargetZohoAccount.UK));
@@ -47,24 +53,38 @@ public class ZohoConnection
 
     private async Task RefreshAccessToken(TargetZohoAccount target = TargetZohoAccount.UK) 
     {
-        string refreshToken = "";
-        string clientId = "";
-        string clientSecret = "";
+        RefreshTokenView result;
 
         switch(target) {
             case TargetZohoAccount.UK:
-                refreshToken = ukRefreshToken;
-                clientId = Environment.GetEnvironmentVariable("ZOHO_UK_CLIENT_ID")  ?? throw new SystemException("Missing ZOHO_UK_CLIENT_ID env var");
-                clientSecret = Environment.GetEnvironmentVariable("ZOHO_UK_CLIENT_SECRET")  ?? throw new SystemException("Missing ZOHO_UK_CLIENT_SECRET env var");
+                result = await GetAccessToken(
+                    zUKAccountsHttpClient,
+                    ukRefreshToken,
+                    Environment.GetEnvironmentVariable("ZOHO_UK_CLIENT_ID")  ?? throw new SystemException("Missing ZOHO_UK_CLIENT_ID env var"),
+                    Environment.GetEnvironmentVariable("ZOHO_UK_CLIENT_SECRET")  ?? throw new SystemException("Missing ZOHO_UK_CLIENT_SECRET env var")
+                );
+
+                _accessTokenRepo.SaveAccessToken(result.accessToken, target);
+
+                zUKPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", result.accessToken);
                 break; 
             case TargetZohoAccount.BR:
-                refreshToken = brRefreshToken;
-                clientId = Environment.GetEnvironmentVariable("ZOHO_BR_CLIENT_ID")  ?? throw new SystemException("Missing ZOHO_BR_CLIENT_ID env var");
-                clientSecret = Environment.GetEnvironmentVariable("ZOHO_BR_CLIENT_SECRET")  ?? throw new SystemException("Missing ZOHO_BR_CLIENT_SECRET env var");
+                result = await GetAccessToken(
+                    zBRAccountsHttpClient,
+                    brRefreshToken,
+                    Environment.GetEnvironmentVariable("ZOHO_BR_CLIENT_ID")  ?? throw new SystemException("Missing ZOHO_BR_CLIENT_ID env var"),
+                    Environment.GetEnvironmentVariable("ZOHO_BR_CLIENT_SECRET")  ?? throw new SystemException("Missing ZOHO_BR_CLIENT_SECRET env var")
+                );
+
+                _accessTokenRepo.SaveAccessToken(result.accessToken, target);
+
+                zBRPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", result.accessToken);
                 break; 
         }
+    }
 
-
+    private async Task<RefreshTokenView> GetAccessToken (HttpClient client, string refreshToken, string clientId, string clientSecret)
+    {
         Dictionary<string, string> queryParams = new (){
             { "refresh_token", refreshToken },
             { "client_id",  clientId},
@@ -72,24 +92,14 @@ public class ZohoConnection
             { "grant_type", "refresh_token" }
         };
 
-        var accessTokenRes = await zAccountsHttpClient.PostAsync("", new FormUrlEncodedContent(queryParams));
+        var accessTokenRes = await client.PostAsync("", new FormUrlEncodedContent(queryParams));
 
         RefreshTokenView? result = JsonConvert.DeserializeObject<RefreshTokenView>(await accessTokenRes.Content.ReadAsStringAsync());
 
         if(result?.accessToken == null)
             throw new DataException("missing access token from query");
 
-        _accessTokenRepo.SaveAccessToken(result.accessToken, target);
-
-        switch(target)
-        {
-            case TargetZohoAccount.UK:
-                zUKPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", result.accessToken);
-                break;
-            case TargetZohoAccount.BR:
-                zBRPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", result.accessToken);
-                break;
-        }
+        return result;
     }
 
 
