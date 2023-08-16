@@ -45,7 +45,7 @@ public class ZohoJobName
         var results = (await _zohoConnection.GetAsync<JobNamesView>("timetracker/getjobs?assingedTo=all", TargetZohoAccount.UK))?.response?.result;
 
         if (results is null)
-            throw new SystemException("The connection to get the BR Job Names list failed");
+            throw new SystemException("The connection to get the UK Job Names list failed");
 
         List<JobNameItem> pairs = new();
 
