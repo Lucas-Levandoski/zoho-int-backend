@@ -67,7 +67,7 @@ public class ZohoConnection
                 _accessTokenRepo.SaveAccessToken(result.accessToken, target);
 
                 zUKPeopleHttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Zoho-oauthtoken", result.accessToken);
-                break; 
+                break;
             case TargetZohoAccount.BR:
                 result = await GetAccessToken(
                     zBRAccountsHttpClient,
