@@ -88,7 +88,7 @@ public class TimeLogFunction
         try {
             var ukTimelogId = await _timeLogService.DeleteOnUKById(id);
             return new OkObjectResult($"Timelogs deleted with the following IDs: \nBR - {id}\nUK - {ukTimelogId}");
-        } 
+        }
         catch (InvalidOperationException ex) {
             // return a Accepted 202 object result meaning that nothing was actually done but it didn't fail
             return new ObjectResult($"the BR Timelog ID -- {id} -- has no related UK Timelog ID, Exception Message: {ex.Message}") { StatusCode = 202 };
