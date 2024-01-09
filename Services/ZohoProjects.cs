@@ -1,16 +1,11 @@
-﻿using System;
-using System.Net.Http;
-using System.Text.Json.Nodes;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft;
 using Newtonsoft.Json;
-using System.Text;
 using ZohoIntegration.TimeLogs.Models;
 using System.Data;
 using System.Linq;
 using System.Collections.Generic;
 using ZohoIntegration.TimeLogs.Repositories;
-using Azure;
 
 namespace ZohoIntegration.TimeLogs.Services;
 public class ZohoProjects

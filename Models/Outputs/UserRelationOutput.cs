@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using ZohoIntegration.TimeLogs.Models;
 
-public class JobNamesRelationOutput
+namespace ZohoIntegration.TimeLogs.Models;
+public class UserRelationOutput
 {
     public List<UserRelationItem> relations { get; set; }
 
-    public static implicit operator JobNamesRelationOutput(List<UserRelationEntity> entities) 
+    public static implicit operator UserRelationOutput(List<UserRelationEntity> entities) 
     {
         List<UserRelationItem> _relations = new();
 
