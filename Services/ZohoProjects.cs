@@ -16,9 +16,9 @@ namespace ZohoIntegration.TimeLogs.Services;
 public class ZohoProjects
 {
     private readonly ZohoConnection _zohoConnection;
-    private readonly JobNameRelation _jobNameRepo;
+    private readonly JobNameRelationRepo _jobNameRepo;
 
-    public ZohoProjects(ZohoConnection zohoConnection, JobNameRelation jobNameRelation)
+    public ZohoProjects(ZohoConnection zohoConnection, JobNameRelationRepo jobNameRelation)
     {
         _zohoConnection = zohoConnection;
         _jobNameRepo = jobNameRelation;

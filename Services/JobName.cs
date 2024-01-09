@@ -7,9 +7,9 @@ using ZohoIntegration.TimeLogs.Repositories;
 namespace ZohoIntegration.TimeLogs.Services;
 public class JobName
 {
-    private readonly JobNameRelation _jobNameRepo;
+    private readonly JobNameRelationRepo _jobNameRepo;
 
-    public JobName(JobNameRelation jobNameRelation)
+    public JobName(JobNameRelationRepo jobNameRelation)
     {
         _jobNameRepo = jobNameRelation;
     }

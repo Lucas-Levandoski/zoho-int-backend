@@ -13,7 +13,7 @@ namespace ZohoIntegration.TimeLogs.Services
     public class ZohoTimeLogs
     {
         private readonly TimeLogRelation _timeLogRepo;  
-        private readonly JobNameRelation _jobNameRepo;  
+        private readonly JobNameRelationRepo _jobNameRepo;  
         private readonly ZohoConnection _zohoConnection;
         private readonly string brAutoText = "From Brazilian Zoho: ";
         private readonly string dateFormat = "dd-MMM-yyyy";
@@ -21,7 +21,7 @@ namespace ZohoIntegration.TimeLogs.Services
         public ZohoTimeLogs(
             TimeLogRelation timeLogRelation, 
             ZohoConnection zohoConnection,
-            JobNameRelation jobNameRelation) 
+            JobNameRelationRepo jobNameRelation) 
         {
             _timeLogRepo = timeLogRelation;
             _zohoConnection = zohoConnection;

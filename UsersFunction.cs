@@ -43,10 +43,10 @@ public class UsersFunction
         {
             string requestBody = await streamReader.ReadToEndAsync();
             body = JsonConvert.DeserializeObject<UsersInput>(requestBody) ?? throw new ArgumentException("Missing request body property");       
-        } 
+        }
 
         await _usersService.AddList(body.users);
 
         return new OkObjectResult("all added");
-    } 
+    }
 }

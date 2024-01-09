@@ -31,9 +31,10 @@ public class Startup: FunctionsStartup
         // repositories
         builder.Services.AddScoped<StorageAccountTableConnection>();
         builder.Services.AddScoped<TimeLogRelation>();
-        builder.Services.AddScoped<JobNameRelation>();
+        builder.Services.AddScoped<JobNameRelationRepo>();
         builder.Services.AddScoped<AccessTokenRepo>();
         builder.Services.AddScoped<UsersRepo>();
+        builder.Services.AddScoped<UserRelationRepo>();
 
         // services
         builder.Services.AddScoped<ZohoTimeLogs>();
@@ -43,5 +44,6 @@ public class Startup: FunctionsStartup
         builder.Services.AddScoped<ZohoConnection>();
         builder.Services.AddScoped<JobName>();
         builder.Services.AddScoped<Users>();
+        builder.Services.AddScoped<UserRelation>();
     }
 }

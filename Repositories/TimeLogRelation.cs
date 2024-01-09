@@ -10,12 +10,13 @@ namespace ZohoIntegration.TimeLogs.Repositories;
 public class TimeLogRelation
 {
     internal readonly StorageAccountTableConnection _tableConnection;
-    internal readonly TableClient tableClient;
+    internal readonly TableClient _tableClient;
+    internal readonly string _partitionKey = "timeLogRelation";
 
     public TimeLogRelation(StorageAccountTableConnection tableConnection)
     {
         _tableConnection = tableConnection;
-        tableClient = tableConnection.GetTableClient("TimeLogRelation");
+        _tableClient = tableConnection.GetTableClient("TimeLogRelation");
     }
 
     public TimeLogRelationEntity SaveRelation(string brId, string ukId)
@@ -23,12 +24,12 @@ public class TimeLogRelation
         var entity = new TimeLogRelationEntity() {
             BRTimeLogID = brId,
             UKTimeLogID = ukId,
-            PartitionKey = "1",
+            PartitionKey = _partitionKey,
             RowKey = Guid.NewGuid().ToString(),
             ETag = new ETag(),
         };
 
-        tableClient.AddEntity(entity);
+        _tableClient.AddEntity(entity);
 
         return entity;
     }
@@ -39,7 +40,7 @@ public class TimeLogRelation
 
         if(entity is not null)
         {
-            tableClient.DeleteEntity(entity.PartitionKey, entity.RowKey);
+            _tableClient.DeleteEntity(entity.PartitionKey, entity.RowKey);
             return;
         }
 
@@ -48,21 +49,21 @@ public class TimeLogRelation
 
     public TimeLogRelationEntity GetByIds(string brId, string ukId) 
     {
-        var result = tableClient.Query<TimeLogRelationEntity>(filter: table => table.UKTimeLogID == ukId && table.BRTimeLogID == brId);
+        var result = _tableClient.Query<TimeLogRelationEntity>(filter: table => table.UKTimeLogID == ukId && table.BRTimeLogID == brId);
 
         return result.FirstOrDefault() ?? throw new InvalidOperationException($"The combination of ids (BR:{brId} - UK:{ukId}) does not match");
     }
 
     public TimeLogRelationEntity GetByUKTimelogID(string id)
     {
-        var result = tableClient.Query<TimeLogRelationEntity>(filter: table => table.UKTimeLogID == id);
+        var result = _tableClient.Query<TimeLogRelationEntity>(filter: table => table.UKTimeLogID == id);
 
         return result.FirstOrDefault() ?? throw new InvalidOperationException($"No Relation found for the given timelog ID {id}");
     }
 
     public TimeLogRelationEntity GetByBRTimelogID(string id)
     {
-        var result = tableClient.Query<TimeLogRelationEntity>(filter: table => table.BRTimeLogID == id);
+        var result = _tableClient.Query<TimeLogRelationEntity>(filter: table => table.BRTimeLogID == id);
 
         return result.FirstOrDefault() ?? throw new InvalidOperationException($"No Relation found for the given timelog ID {id}");
     }

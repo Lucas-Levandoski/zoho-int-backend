@@ -14,13 +14,13 @@ public class ZohoTimesheets
 {
 
     private readonly ZohoConnection _zohoConnection;
-    private readonly JobNameRelation _jobNameRepo;
+    private readonly JobNameRelationRepo _jobNameRepo;
     private readonly UsersRepo _usersRepo;
     private readonly string dateFormat = "dd-MMM-yyyy";
     private readonly DateTime today = DateTime.Today;
     private readonly CultureInfo culture;
 
-    public ZohoTimesheets(ZohoConnection zohoConnection, JobNameRelation jobNameRelation, UsersRepo usersRepo)
+    public ZohoTimesheets(ZohoConnection zohoConnection, JobNameRelationRepo jobNameRelation, UsersRepo usersRepo)
     {
         _zohoConnection = zohoConnection;
         _jobNameRepo = jobNameRelation;

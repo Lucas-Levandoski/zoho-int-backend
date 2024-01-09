@@ -15,11 +15,11 @@ namespace ZohoIntegration.TimeLogs.Services;
 public class ZohoJobName
 { 
     private readonly ZohoConnection _zohoConnection;
-    private readonly JobNameRelation _jobNameRepo;
+    private readonly JobNameRelationRepo _jobNameRepo;
 
     public ZohoJobName(
         ZohoConnection zohoConnection,
-        JobNameRelation jobNameRelation) 
+        JobNameRelationRepo jobNameRelation) 
     {
         _zohoConnection = zohoConnection;
         _jobNameRepo = jobNameRelation;

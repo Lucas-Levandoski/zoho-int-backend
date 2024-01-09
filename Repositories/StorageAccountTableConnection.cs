@@ -1,5 +1,6 @@
 ﻿using System;
 using Azure.Data.Tables;
+using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Extensions;
 
 namespace ZohoIntegration.TimeLogs.Repositories;
 public class StorageAccountTableConnection
@@ -23,4 +24,8 @@ public class StorageAccountTableConnection
         return tableServiceClient.GetTableClient(tableName);
     }
 
+    public void CheckConnection() 
+    {
+        tableServiceClient.GetStatistics();
+    }
 }

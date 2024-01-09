@@ -23,4 +23,10 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Entities\" />
+    <Folder Include="Models\Inputs\" />
+    <Folder Include="Models\Outputs\" />
+    <Folder Include="Models\Views\" />
+  </ItemGroup>
 </Project>
